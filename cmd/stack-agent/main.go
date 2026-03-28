@@ -41,7 +41,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("stack-agent", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 
-	defaultConfig := findConfigFile("/etc/stack-agent")
+	defaultConfig := findConfigFile("/opt/stack-agent")
 	if envPath := os.Getenv("STACK_AGENT_CONFIG"); envPath != "" {
 		defaultConfig = envPath
 	}

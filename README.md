@@ -70,7 +70,7 @@ docker logs -f stack-agent
 
 ## Configuration
 
-The config file is read from `/etc/stack-agent/config.yaml` (or `config.yml`) by default, preferring `.yaml`. Override the path with the `--config` flag or the `STACK_AGENT_CONFIG` environment variable.
+The config file is read from `/opt/stack-agent/config.yaml` (or `config.yml`) by default, preferring `.yaml`. Override the path with the `--config` flag or the `STACK_AGENT_CONFIG` environment variable.
 
 ```yaml
 # Global defaults (all overridable per stack)
@@ -102,7 +102,7 @@ stacks:
 |---|---|---|---|
 | `poll_interval` | int | `60` | Polling interval in seconds. Applied to all stacks unless overridden. |
 | `branch` | string | `main` | Git branch to track. |
-| `work_dir` | string | `/var/lib/stack-agent/stacks` | Directory where repos are checked out and state is stored. |
+| `work_dir` | string | `/opt/stack-agent/data` | Directory where repos are checked out and state is stored. |
 | `token` | string | _(empty)_ | Auth token for private repos. Supports `${ENV_VAR}` interpolation. |
 
 ### Per-stack fields
@@ -142,9 +142,9 @@ Token resolution order: per-stack `token` → `defaults.token` → empty (public
 
 | Method | Example |
 |---|---|
-| Default path | `/etc/stack-agent/config.yaml` (falls back to `config.yml`) |
-| `--config` flag | `stack-agent --config /opt/stack-agent/config.yaml` |
-| Environment variable | `STACK_AGENT_CONFIG=/opt/stack-agent/config.yaml` |
+| Default path | `/opt/stack-agent/config.yaml` (falls back to `config.yml`) |
+| `--config` flag | `stack-agent --config /etc/stack-agent/config.yaml` |
+| Environment variable | `STACK_AGENT_CONFIG=/etc/stack-agent/config.yaml` |
 
 ## Environment variables
 

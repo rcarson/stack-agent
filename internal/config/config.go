@@ -152,6 +152,11 @@ func Load(path string) (*Config, error) {
 		defaults.PollInterval = defaultPollInterval
 	}
 
+	// Apply default work_dir when not set.
+	if defaults.WorkDir == "" {
+		defaults.WorkDir = "/opt/stack-agent/data"
+	}
+
 	// Validate and merge stacks.
 	seenNames := make(map[string]struct{}, len(raw.Stacks))
 	stacks := make([]StackConfig, 0, len(raw.Stacks))
