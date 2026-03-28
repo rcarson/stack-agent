@@ -135,5 +135,6 @@ func resolveEnvFile(workDir, name, envFile string) string {
 	if _, err := os.Stat(candidate); err == nil {
 		return candidate
 	}
+	slog.Debug("agent: no env file found, deploying without one", "stack", name, "checked", candidate)
 	return ""
 }
