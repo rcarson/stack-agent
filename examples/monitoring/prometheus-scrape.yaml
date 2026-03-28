@@ -3,7 +3,7 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: stack-agent
+  - job_name: steward
     static_configs:
       - targets:
-          - stack-agent:2112
+          - steward:2112

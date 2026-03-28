@@ -14,13 +14,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/b0rked-dev/stack-agent/internal/agent"
-	"github.com/b0rked-dev/stack-agent/internal/compose"
-	"github.com/b0rked-dev/stack-agent/internal/config"
-	"github.com/b0rked-dev/stack-agent/internal/git"
-	"github.com/b0rked-dev/stack-agent/internal/metrics"
-	"github.com/b0rked-dev/stack-agent/internal/server"
-	"github.com/b0rked-dev/stack-agent/internal/state"
+	"github.com/b0rked-dev/steward/internal/agent"
+	"github.com/b0rked-dev/steward/internal/compose"
+	"github.com/b0rked-dev/steward/internal/config"
+	"github.com/b0rked-dev/steward/internal/git"
+	"github.com/b0rked-dev/steward/internal/metrics"
+	"github.com/b0rked-dev/steward/internal/server"
+	"github.com/b0rked-dev/steward/internal/state"
 )
 
 // Version is set at build time via -ldflags "-X main.Version=<tag>".
@@ -47,11 +47,11 @@ func main() {
 func run(args []string, stdout, stderr io.Writer) int {
 	startTime := time.Now()
 
-	fs := flag.NewFlagSet("stack-agent", flag.ContinueOnError)
+	fs := flag.NewFlagSet("steward", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 
-	defaultConfig := findConfigFile("/opt/stack-agent")
-	if envPath := os.Getenv("STACK_AGENT_CONFIG"); envPath != "" {
+	defaultConfig := findConfigFile("/opt/steward")
+	if envPath := os.Getenv("STEWARD_CONFIG"); envPath != "" {
 		defaultConfig = envPath
 	}
 
@@ -61,9 +61,9 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 1
 	}
 
-	// Configure slog based on STACK_AGENT_LOG_LEVEL.
+	// Configure slog based on STEWARD_LOG_LEVEL.
 	level := slog.LevelInfo
-	if lvlStr := os.Getenv("STACK_AGENT_LOG_LEVEL"); lvlStr != "" {
+	if lvlStr := os.Getenv("STEWARD_LOG_LEVEL"); lvlStr != "" {
 		switch strings.ToLower(lvlStr) {
 		case "debug":
 			level = slog.LevelDebug
@@ -82,11 +82,11 @@ func run(args []string, stdout, stderr io.Writer) int {
 	// Load config.
 	cfg, err := config.Load(*configPath)
 	if err != nil {
-		fmt.Fprintf(stderr, "stack-agent: failed to load config %q: %v\n", *configPath, err)
+		fmt.Fprintf(stderr, "steward: failed to load config %q: %v\n", *configPath, err)
 		return 1
 	}
 
-	httpAddr := os.Getenv("STACK_AGENT_HTTP_ADDR")
+	httpAddr := os.Getenv("STEWARD_HTTP_ADDR")
 	if httpAddr == "" {
 		httpAddr = ":2112"
 	}
@@ -95,7 +95,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	for i, sc := range cfg.Stacks {
 		stackNames[i] = sc.Name
 	}
-	slog.Info("stack-agent starting",
+	slog.Info("steward starting",
 		"version", Version,
 		"config", *configPath,
 		"stacks", len(cfg.Stacks),
@@ -114,14 +114,14 @@ func run(args []string, stdout, stderr io.Writer) int {
 	gitClient := git.New()
 	composeRunner := compose.NewDockerRunner()
 
-	workDir := "/opt/stack-agent/data"
+	workDir := "/opt/steward/data"
 	if len(cfg.Stacks) > 0 {
 		workDir = cfg.Stacks[0].WorkDir
 	}
 	statePath := filepath.Join(workDir, ".state.json")
 	stateStore, err := state.NewFileStore(statePath)
 	if err != nil {
-		fmt.Fprintf(stderr, "stack-agent: failed to initialize state store: %v\n", err)
+		fmt.Fprintf(stderr, "steward: failed to initialize state store: %v\n", err)
 		return 1
 	}
 

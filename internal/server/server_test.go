@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/b0rked-dev/stack-agent/internal/server"
+	"github.com/b0rked-dev/steward/internal/server"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

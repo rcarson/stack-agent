@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/b0rked-dev/stack-agent/internal/agent"
-	"github.com/b0rked-dev/stack-agent/internal/compose"
-	"github.com/b0rked-dev/stack-agent/internal/config"
-	"github.com/b0rked-dev/stack-agent/internal/git"
-	"github.com/b0rked-dev/stack-agent/internal/state"
+	"github.com/b0rked-dev/steward/internal/agent"
+	"github.com/b0rked-dev/steward/internal/compose"
+	"github.com/b0rked-dev/steward/internal/config"
+	"github.com/b0rked-dev/steward/internal/git"
+	"github.com/b0rked-dev/steward/internal/state"
 )
 
 const (

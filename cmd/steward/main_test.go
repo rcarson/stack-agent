@@ -136,7 +136,7 @@ stacks:
 			t.Errorf("expected exit code 0, got %d", result.code)
 		}
 		logs := result.stderr
-		if !strings.Contains(logs, "stack-agent starting") {
+		if !strings.Contains(logs, "steward starting") {
 			t.Errorf("startup banner not found in logs:\n%s", logs)
 		}
 		if !strings.Contains(logs, cfgPath) {

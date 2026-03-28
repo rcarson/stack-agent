@@ -3,17 +3,17 @@ FROM golang:1.26-alpine AS builder
 ARG VERSION=dev
 WORKDIR /build
 COPY . .
-RUN go build -ldflags "-X main.Version=${VERSION}" -o /stack-agent ./cmd/stack-agent
+RUN go build -ldflags "-X main.Version=${VERSION}" -o /steward ./cmd/steward
 
 FROM alpine:3.21
 
-RUN adduser -D -u 1000 agent && mkdir -p /opt/stack-agent/data && chown -R agent:agent /opt/stack-agent
+RUN adduser -D -u 1000 agent && mkdir -p /opt/steward/data && chown -R agent:agent /opt/steward
 
-COPY --from=builder /stack-agent /stack-agent
+COPY --from=builder /steward /steward
 
 USER agent
-WORKDIR /opt/stack-agent
+WORKDIR /opt/steward
 
 EXPOSE 2112
 
-ENTRYPOINT ["/stack-agent"]
+ENTRYPOINT ["/steward"]

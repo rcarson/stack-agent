@@ -1,17 +1,17 @@
 services:
-  stack-agent:
-    image: ghcr.io/b0rked-dev/stack-agent:latest
+  steward:
+    image: ghcr.io/b0rked-dev/steward:latest
     restart: unless-stopped
     ports:
       - "2112:2112"
     environment:
-      # Token for private repos. Resolves via STACK_AGENT_DEFAULT_TOKEN env var.
+      # Token for private repos. Resolves via STEWARD_DEFAULT_TOKEN env var.
       # Remove if all your repos are public.
-      - STACK_AGENT_DEFAULT_TOKEN=${STACK_AGENT_DEFAULT_TOKEN}
-      - STACK_AGENT_LOG_LEVEL=info
+      - STEWARD_DEFAULT_TOKEN=${STEWARD_DEFAULT_TOKEN}
+      - STEWARD_LOG_LEVEL=info
       # Address for the HTTP server that exposes /healthz and /metrics (Prometheus).
       # Defaults to :2112 when unset. Change if port 2112 is already in use.
-      - STACK_AGENT_HTTP_ADDR=:2112
+      - STEWARD_HTTP_ADDR=:2112
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:2112/healthz || exit 1"]
       interval: 30s
@@ -20,5 +20,5 @@ services:
       start_period: 10s
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./config.yaml:/opt/stack-agent/config.yaml:ro
-      - ./data:/opt/stack-agent/data
+      - ./config.yaml:/opt/steward/config.yaml:ro
+      - ./data:/opt/steward/data

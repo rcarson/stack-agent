@@ -1,6 +1,8 @@
-# stack-agent
+# steward
 
-A lightweight per-host daemon written in Go that watches Git repositories for changes to Docker Compose stacks and reconciles the running state automatically. Each host runs its own agent instance — there is no coordinator, no database, and no UI. State is minimal and local.
+**Continuous reconciliation for Docker Compose stacks.**
+
+A lightweight per-host daemon written in Go that watches Git repositories for changes to Docker Compose stacks and reconciles the running state automatically. Each host runs its own instance — there is no coordinator, no database, and no UI. State is minimal and local.
 
 ## How it works
 
@@ -22,43 +24,43 @@ Git operations use [go-git](https://github.com/go-git/go-git), a pure Go impleme
 **1. Create the directory layout on the host.**
 
 ```bash
-mkdir -p /opt/stack-agent/data
+mkdir -p /opt/steward/data
 ```
 
 **2. Write a config file.**
 
 ```bash
-cp config.example.yaml /opt/stack-agent/config.yaml
-# Edit /opt/stack-agent/config.yaml for your stacks
+cp config.example.yaml /opt/steward/config.yaml
+# Edit /opt/steward/config.yaml for your stacks
 ```
 
 **3. Create a `.env` file with any tokens (chmod 600).**
 
 ```bash
-# /opt/stack-agent/.env
-STACK_AGENT_DEFAULT_TOKEN=ghp_abc123...
-chmod 600 /opt/stack-agent/.env
+# /opt/steward/.env
+STEWARD_DEFAULT_TOKEN=ghp_abc123...
+chmod 600 /opt/steward/.env
 ```
 
 **4. Deploy with Docker Compose.**
 
 ```bash
-cd /opt/stack-agent && docker compose up -d
+cd /opt/steward && docker compose up -d
 ```
 
-The `examples/docker-compose/compose.yaml` in this repository is the deployment manifest for the agent itself. Copy it to `/opt/stack-agent/compose.yaml` and adjust the volume mounts if needed:
+The `examples/docker-compose/compose.yaml` in this repository is the deployment manifest for the agent itself. Copy it to `/opt/steward/compose.yaml` and adjust the volume mounts if needed:
 
 ```yaml
 services:
-  stack-agent:
-    image: ghcr.io/b0rked-dev/stack-agent:latest
+  steward:
+    image: ghcr.io/b0rked-dev/steward:latest
     restart: unless-stopped
     ports:
       - "2112:2112"
     environment:
-      - STACK_AGENT_DEFAULT_TOKEN=${STACK_AGENT_DEFAULT_TOKEN}
-      - STACK_AGENT_LOG_LEVEL=info
-      - STACK_AGENT_HTTP_ADDR=:2112
+      - STEWARD_DEFAULT_TOKEN=${STEWARD_DEFAULT_TOKEN}
+      - STEWARD_LOG_LEVEL=info
+      - STEWARD_HTTP_ADDR=:2112
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:2112/healthz || exit 1"]
       interval: 30s
@@ -67,27 +69,27 @@ services:
       start_period: 10s
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./config.yaml:/opt/stack-agent/config.yaml:ro
-      - ./data:/opt/stack-agent/data
+      - ./config.yaml:/opt/steward/config.yaml:ro
+      - ./data:/opt/steward/data
 ```
 
 View logs with:
 
 ```bash
-docker logs -f stack-agent
+docker logs -f steward
 ```
 
 ## Configuration
 
-The config file is read from `/opt/stack-agent/config.yaml` (or `config.yml`) by default, preferring `.yaml`. Override the path with the `--config` flag or the `STACK_AGENT_CONFIG` environment variable.
+The config file is read from `/opt/steward/config.yaml` (or `config.yml`) by default, preferring `.yaml`. Override the path with the `--config` flag or the `STEWARD_CONFIG` environment variable.
 
 ```yaml
 # Global defaults (all overridable per stack)
 defaults:
   poll_interval: 60
   branch: main
-  work_dir: /var/lib/stack-agent/stacks
-  token: ${STACK_AGENT_DEFAULT_TOKEN}  # optional
+  work_dir: /var/lib/steward/stacks
+  token: ${STEWARD_DEFAULT_TOKEN}  # optional
 
 stacks:
   - name: immich
@@ -111,7 +113,7 @@ stacks:
 |---|---|---|---|
 | `poll_interval` | int | `60` | Polling interval in seconds. Applied to all stacks unless overridden. |
 | `branch` | string | `main` | Git branch to track. |
-| `work_dir` | string | `/opt/stack-agent/data` | Directory where repos are checked out and state is stored. |
+| `work_dir` | string | `/opt/steward/data` | Directory where repos are checked out and state is stored. |
 | `token` | string | _(empty)_ | Auth token for private repos. Supports `${ENV_VAR}` interpolation. |
 
 ### Per-stack fields
@@ -135,14 +137,14 @@ Tokens are never written to disk inside the container and never appear in log ou
 ```yaml
 # compose.yaml environment section
 environment:
-  - STACK_AGENT_DEFAULT_TOKEN=${STACK_AGENT_DEFAULT_TOKEN}
+  - STEWARD_DEFAULT_TOKEN=${STEWARD_DEFAULT_TOKEN}
 ```
 
 ```yaml
 # config.yaml
 stacks:
   - name: mystack
-    token: ${STACK_AGENT_DEFAULT_TOKEN}
+    token: ${STEWARD_DEFAULT_TOKEN}
 ```
 
 Token resolution order: per-stack `token` → `defaults.token` → empty (public repo).
@@ -151,18 +153,18 @@ Token resolution order: per-stack `token` → `defaults.token` → empty (public
 
 | Method | Example |
 |---|---|
-| Default path | `/opt/stack-agent/config.yaml` (falls back to `config.yml`) |
-| `--config` flag | `stack-agent --config /etc/stack-agent/config.yaml` |
-| Environment variable | `STACK_AGENT_CONFIG=/etc/stack-agent/config.yaml` |
+| Default path | `/opt/steward/config.yaml` (falls back to `config.yml`) |
+| `--config` flag | `steward --config /etc/steward/config.yaml` |
+| Environment variable | `STEWARD_CONFIG=/etc/steward/config.yaml` |
 
 ## Environment variables
 
 | Variable | Description |
 |---|---|
-| `STACK_AGENT_CONFIG` | Path to the config file. Equivalent to `--config`. |
-| `STACK_AGENT_LOG_LEVEL` | Log verbosity: `debug`, `info`, `warn`, or `error`. Defaults to `info`. |
-| `STACK_AGENT_HTTP_ADDR` | Listen address for the HTTP server exposing `/healthz` and `/metrics`. Defaults to `:2112`. Change if port 2112 is already in use on the host (e.g. `STACK_AGENT_HTTP_ADDR=:9100`). |
-| `STACK_AGENT_DEFAULT_TOKEN` | Default auth token for private repos. Used when no per-stack `token` is set. |
+| `STEWARD_CONFIG` | Path to the config file. Equivalent to `--config`. |
+| `STEWARD_LOG_LEVEL` | Log verbosity: `debug`, `info`, `warn`, or `error`. Defaults to `info`. |
+| `STEWARD_HTTP_ADDR` | Listen address for the HTTP server exposing `/healthz` and `/metrics`. Defaults to `:2112`. Change if port 2112 is already in use on the host (e.g. `STEWARD_HTTP_ADDR=:9100`). |
+| `STEWARD_DEFAULT_TOKEN` | Default auth token for private repos. Used when no per-stack `token` is set. |
 
 ## Observability
 
@@ -172,9 +174,9 @@ Every successful deploy logs: stack name, old hash, new hash, and duration.
 
 Every error logs: stack name, operation, and error string. Tokens are redacted from all error messages before logging.
 
-Set `STACK_AGENT_LOG_LEVEL=debug` to see hash comparisons and poll timing.
+Set `STEWARD_LOG_LEVEL=debug` to see hash comparisons and poll timing.
 
-stack-agent exposes two HTTP endpoints on `STACK_AGENT_HTTP_ADDR` (default `:2112`):
+steward exposes two HTTP endpoints on `STEWARD_HTTP_ADDR` (default `:2112`):
 
 | Endpoint | Description |
 |---|---|
@@ -187,10 +189,10 @@ See `examples/monitoring/` for a Grafana dashboard and Prometheus scrape config.
 
 ```bash
 # Build the binary
-go build -o stack-agent ./cmd/stack-agent
+go build -o steward ./cmd/steward
 
 # Build the container image
-docker build -t stack-agent .
+docker build -t steward .
 ```
 
 The Dockerfile uses a two-stage build: Go 1.26 Alpine builder, Alpine 3.21 runtime. The binary runs as a non-root user (`agent`, uid 1000). No git binary is included in the image — go-git is pure Go.

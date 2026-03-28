@@ -1,4 +1,4 @@
-# stack-agent — Agent Instructions
+# steward — Agent Instructions
 
 ## Branching and pull requests
 

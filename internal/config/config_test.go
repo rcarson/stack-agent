@@ -24,8 +24,8 @@ const validYAML = `
 defaults:
   poll_interval: 60
   branch: main
-  work_dir: /var/lib/stack-agent/stacks
-  token: ${STACK_AGENT_DEFAULT_TOKEN}
+  work_dir: /var/lib/steward/stacks
+  token: ${STEWARD_DEFAULT_TOKEN}
 
 stacks:
   - name: immich
@@ -340,7 +340,7 @@ stacks:
 }
 
 func TestLoad_ImplicitDefaultToken(t *testing.T) {
-	t.Setenv("STACK_AGENT_DEFAULT_TOKEN", "implicit-token")
+	t.Setenv("STEWARD_DEFAULT_TOKEN", "implicit-token")
 
 	p := writeTemp(t, `
 stacks:
@@ -375,7 +375,7 @@ stacks:
 }
 
 func TestLoad_ExplicitTokenOverridesImplicit(t *testing.T) {
-	t.Setenv("STACK_AGENT_DEFAULT_TOKEN", "implicit-token")
+	t.Setenv("STEWARD_DEFAULT_TOKEN", "implicit-token")
 	t.Setenv("MY_TOKEN", "explicit-token")
 
 	p := writeTemp(t, `

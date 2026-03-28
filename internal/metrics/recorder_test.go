@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/b0rked-dev/stack-agent/internal/metrics"
+	"github.com/b0rked-dev/steward/internal/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
 )

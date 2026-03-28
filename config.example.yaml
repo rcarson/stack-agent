@@ -2,8 +2,8 @@
 defaults:
   poll_interval: 60
   branch: main
-  # work_dir defaults to /opt/stack-agent/data — omit unless you need a custom path
-  # token is not required — stack-agent falls back to STACK_AGENT_DEFAULT_TOKEN automatically
+  # work_dir defaults to /opt/steward/data — omit unless you need a custom path
+  # token is not required — steward falls back to STEWARD_DEFAULT_TOKEN automatically
 
 stacks:
   - name: immich

@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-// Runner provides docker compose operations used by stack-agent.
+// Runner provides docker compose operations used by steward.
 type Runner interface {
 	// Up runs: docker compose [--project-name <projectName>] -f <composePath> [--env-file <envFile>] up -d --remove-orphans
 	// projectName is optional; pass empty string to omit it and let Docker derive the name from the directory.

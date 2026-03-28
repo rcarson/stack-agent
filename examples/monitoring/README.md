@@ -1,17 +1,17 @@
-# stack-agent monitoring
+# steward monitoring
 
-Grafana dashboard and Prometheus scrape config for stack-agent.
+Grafana dashboard and Prometheus scrape config for steward.
 
 ## Files
 
 | File | Description |
 |---|---|
-| `stack-agent-dashboard.json` | Pre-built Grafana dashboard — import via the Grafana UI |
+| `steward-dashboard.json` | Pre-built Grafana dashboard — import via the Grafana UI |
 | `prometheus-scrape.yaml` | Scrape job snippet — add to your `scrape_configs` |
 
 ## Grafana dashboard
 
-Import `stack-agent-dashboard.json` via **Dashboards → Import** in the Grafana UI, or drop it into your provisioning directory. Select your Prometheus datasource when prompted.
+Import `steward-dashboard.json` via **Dashboards → Import** in the Grafana UI, or drop it into your provisioning directory. Select your Prometheus datasource when prompted.
 
 ### Panels
 
@@ -25,14 +25,14 @@ Import `stack-agent-dashboard.json` via **Dashboards → Import** in the Grafana
 
 ## Prometheus scrape config
 
-Add the contents of `prometheus-scrape.yaml` to the `scrape_configs` section of your `prometheus.yaml`, adjusting the target address to match your stack-agent host:
+Add the contents of `prometheus-scrape.yaml` to the `scrape_configs` section of your `prometheus.yaml`, adjusting the target address to match your steward host:
 
 ```yaml
 scrape_configs:
-  - job_name: stack-agent
+  - job_name: steward
     static_configs:
       - targets:
-          - <stack-agent-host>:2112
+          - <steward-host>:2112
 ```
 
-stack-agent exposes metrics at `:2112/metrics` by default. Override with the `STACK_AGENT_HTTP_ADDR` environment variable.
+steward exposes metrics at `:2112/metrics` by default. Override with the `STEWARD_HTTP_ADDR` environment variable.

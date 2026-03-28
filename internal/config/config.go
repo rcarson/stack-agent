@@ -92,9 +92,9 @@ func mergeStack(raw rawStack, defaults rawDefaults) StackConfig {
 		token = raw.Token
 	}
 	token = interpolate(token)
-	// Implicit fallback: if no token was configured, check STACK_AGENT_DEFAULT_TOKEN.
+	// Implicit fallback: if no token was configured, check STEWARD_DEFAULT_TOKEN.
 	if token == "" {
-		token = os.Getenv("STACK_AGENT_DEFAULT_TOKEN")
+		token = os.Getenv("STEWARD_DEFAULT_TOKEN")
 	}
 
 	pollInterval := defaults.PollInterval
@@ -155,7 +155,7 @@ func Load(path string) (*Config, error) {
 
 	// Apply default work_dir when not set.
 	if defaults.WorkDir == "" {
-		defaults.WorkDir = "/opt/stack-agent/data"
+		defaults.WorkDir = "/opt/steward/data"
 	}
 
 	// Validate and merge stacks.

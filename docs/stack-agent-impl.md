@@ -1,4 +1,4 @@
-# stack-agent: Implementation Specification
+# steward: Implementation Specification
 
 A lightweight per-host daemon written in Go that watches Git repositories for
 changes to Docker Compose stacks and reconciles running state automatically.
@@ -27,9 +27,9 @@ changes to Docker Compose stacks and reconciles running state automatically.
 ## Project Layout
 
 ```
-stack-agent/
+steward/
 ├── cmd/
-│   └── stack-agent/
+│   └── steward/
 │       └── main.go          # Entry point, signal handling, wiring
 ├── internal/
 │   ├── config/
@@ -49,7 +49,7 @@ stack-agent/
 │       └── agent_test.go
 ├── config.example.yml
 ├── Dockerfile
-├── compose.yml              # For running stack-agent itself
+├── compose.yml              # For running steward itself
 └── README.md
 ```
 
@@ -57,16 +57,16 @@ stack-agent/
 
 ## Configuration
 
-Defined in `/etc/stack-agent/config.yml` (path overridable via `--config` flag
-or `STACK_AGENT_CONFIG` env var).
+Defined in `/etc/steward/config.yml` (path overridable via `--config` flag
+or `STEWARD_CONFIG` env var).
 
 ```yaml
 # Global defaults (all overridable per stack)
 defaults:
   poll_interval: 60          # seconds
   branch: main
-  work_dir: /var/lib/stack-agent/stacks
-  token: ${STACK_AGENT_DEFAULT_TOKEN}  # optional, env var interpolated
+  work_dir: /var/lib/steward/stacks
+  token: ${STEWARD_DEFAULT_TOKEN}  # optional, env var interpolated
 
 stacks:
   - name: immich
@@ -307,7 +307,7 @@ failed deploy will be retried on the next poll.
 
 ---
 
-### `cmd/stack-agent`
+### `cmd/steward`
 
 Entry point. Responsibilities:
 
@@ -329,19 +329,19 @@ Entry point. Responsibilities:
 The agent ships as a container and is deployed as its own compose stack on each host.
 
 ```yaml
-# /opt/stacks/stack-agent/compose.yml
+# /opt/stacks/steward/compose.yml
 services:
-  stack-agent:
-    image: ghcr.io/mtc/stack-agent:latest
+  steward:
+    image: ghcr.io/mtc/steward:latest
     restart: unless-stopped
     environment:
       - HOST_SERVICES_TOKEN=${HOST_SERVICES_TOKEN}  # token passed from host env
-      - STACK_AGENT_LOG_LEVEL=info
+      - STEWARD_LOG_LEVEL=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/stack-agent/config.yml:/etc/stack-agent/config.yml:ro
+      - /etc/steward/config.yml:/etc/steward/config.yml:ro
       - /etc/stacks:/etc/stacks:ro          # host-local env files
-      - /var/lib/stack-agent:/var/lib/stack-agent  # state + work dir
+      - /var/lib/steward:/var/lib/steward  # state + work dir
 ```
 
 Tokens are passed into the container via environment variables and referenced
@@ -351,7 +351,7 @@ disk inside the container and never appear in logs.
 The host-side `.env` file for the compose stack holds the actual token values:
 
 ```bash
-# /opt/stacks/stack-agent/.env  (chmod 600, outside the repo)
+# /opt/stacks/steward/.env  (chmod 600, outside the repo)
 HOST_SERVICES_TOKEN=ghp_abc123...
 ```
 
@@ -362,11 +362,11 @@ No git binary is required in the image — `go-git` is pure Go.
 ## Observability
 
 - All output to stdout/stderr (structured with `log/slog`)
-- Log level configurable via `STACK_AGENT_LOG_LEVEL` (debug, info, warn, error)
+- Log level configurable via `STEWARD_LOG_LEVEL` (debug, info, warn, error)
 - Every deploy logs: stack name, old hash, new hash, duration, success/failure
 - Every error logs: stack name, operation, error string
 
-No metrics endpoint in v1. `docker logs stack-agent` is sufficient.
+No metrics endpoint in v1. `docker logs steward` is sufficient.
 
 ---
 
@@ -389,10 +389,10 @@ go test ./...
 go test -race ./...
 
 # Build binary
-go build -o stack-agent ./cmd/stack-agent
+go build -o steward ./cmd/steward
 
 # Build container
-docker build -t stack-agent .
+docker build -t steward .
 ```
 
 Tests use interface mocks for `git.Client`, `compose.Runner`, and `state.Store`
@@ -424,7 +424,7 @@ on developer machines to run the standard test suite.
 ## Future Considerations (v2+)
 
 - Webhook receiver as an alternative to polling (faster deploys)
-- `stack-agent status` CLI subcommand to show current state
+- `steward status` CLI subcommand to show current state
 - Slack/webhook notification on deploy success or failure
 - Support for multiple repos (already supported by config structure)
 - Health check endpoint (`/healthz`) for container orchestration
