@@ -20,6 +20,19 @@ import (
 	"github.com/rcarson/stack-agent/internal/state"
 )
 
+// findConfigFile returns the path to the first config file found in dir,
+// checking config.yaml then config.yml. Falls back to config.yaml if neither exists
+// so the error message is meaningful.
+func findConfigFile(dir string) string {
+	for _, name := range []string{"config.yaml", "config.yml"} {
+		p := filepath.Join(dir, name)
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+	return filepath.Join(dir, "config.yaml")
+}
+
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
 }
@@ -28,7 +41,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("stack-agent", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 
-	defaultConfig := "/etc/stack-agent/config.yml"
+	defaultConfig := findConfigFile("/etc/stack-agent")
 	if envPath := os.Getenv("STACK_AGENT_CONFIG"); envPath != "" {
 		defaultConfig = envPath
 	}
