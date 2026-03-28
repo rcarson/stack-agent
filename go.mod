@@ -1,4 +1,4 @@
-module github.com/rcarson/stack-agent
+module github.com/b0rked-dev/stack-agent
 
 go 1.26
 

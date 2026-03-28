@@ -39,7 +39,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v6
         with:
-          images: ghcr.io/rcarson/stack-agent
+          images: ghcr.io/b0rked-dev/stack-agent
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}

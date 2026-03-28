@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/b0rked-dev/stack-agent/internal/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
-	"github.com/rcarson/stack-agent/internal/metrics"
 )
 
 // gatherCounter gathers all metrics from reg and returns the value of the

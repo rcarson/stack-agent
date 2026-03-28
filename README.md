@@ -51,7 +51,7 @@ The `examples/docker-compose/compose.yaml` in this repository is the deployment 
 ```yaml
 services:
   stack-agent:
-    image: ghcr.io/rcarson/stack-agent:latest
+    image: ghcr.io/b0rked-dev/stack-agent:latest
     restart: unless-stopped
     ports:
       - "2112:2112"

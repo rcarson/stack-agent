@@ -14,13 +14,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/rcarson/stack-agent/internal/agent"
-	"github.com/rcarson/stack-agent/internal/compose"
-	"github.com/rcarson/stack-agent/internal/config"
-	"github.com/rcarson/stack-agent/internal/git"
-	"github.com/rcarson/stack-agent/internal/metrics"
-	"github.com/rcarson/stack-agent/internal/server"
-	"github.com/rcarson/stack-agent/internal/state"
+	"github.com/b0rked-dev/stack-agent/internal/agent"
+	"github.com/b0rked-dev/stack-agent/internal/compose"
+	"github.com/b0rked-dev/stack-agent/internal/config"
+	"github.com/b0rked-dev/stack-agent/internal/git"
+	"github.com/b0rked-dev/stack-agent/internal/metrics"
+	"github.com/b0rked-dev/stack-agent/internal/server"
+	"github.com/b0rked-dev/stack-agent/internal/state"
 )
 
 // Version is set at build time via -ldflags "-X main.Version=<tag>".
