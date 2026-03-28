@@ -78,8 +78,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 
 	if len(cfg.Stacks) == 0 {
-		fmt.Fprintf(stderr, "stack-agent: no stacks configured\n")
-		return 1
+		slog.Warn("no stacks configured — waiting for shutdown signal")
 	}
 
 	// Initialize shared dependencies.
