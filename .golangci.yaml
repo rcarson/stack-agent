@@ -16,10 +16,9 @@ linters:
       exclude-functions:
         - fmt.Fprintf
         - fmt.Fprintln
-
-exclusions:
-  rules:
-    # Test files are allowed to use t.Fatal without wrapping errors.
-    - path: _test\.go
-      linters:
-        - errcheck
+  exclusions:
+    rules:
+      # Test files are allowed to use t.Fatal without wrapping errors.
+      - path: _test\.go
+        linters:
+          - errcheck
