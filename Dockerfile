@@ -1,8 +1,9 @@
 FROM golang:1.26-alpine AS builder
 
+ARG VERSION=dev
 WORKDIR /build
 COPY . .
-RUN go build -o /stack-agent ./cmd/stack-agent
+RUN go build -ldflags "-X main.Version=${VERSION}" -o /stack-agent ./cmd/stack-agent
 
 FROM alpine:3.21
 

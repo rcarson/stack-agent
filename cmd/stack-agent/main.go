@@ -20,6 +20,10 @@ import (
 	"github.com/rcarson/stack-agent/internal/state"
 )
 
+// Version is set at build time via -ldflags "-X main.Version=<tag>".
+// It falls back to "dev" for local builds.
+var Version = "dev"
+
 // findConfigFile returns the path to the first config file found in dir,
 // checking config.yaml then config.yml. Falls back to config.yaml if neither exists
 // so the error message is meaningful.
@@ -76,6 +80,17 @@ func run(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "stack-agent: failed to load config %q: %v\n", *configPath, err)
 		return 1
 	}
+
+	stackNames := make([]string, len(cfg.Stacks))
+	for i, sc := range cfg.Stacks {
+		stackNames[i] = sc.Name
+	}
+	slog.Info("stack-agent starting",
+		"version", Version,
+		"config", *configPath,
+		"stacks", len(cfg.Stacks),
+		"stack_names", stackNames,
+	)
 
 	if len(cfg.Stacks) == 0 {
 		slog.Warn("no stacks configured — waiting for shutdown signal")
