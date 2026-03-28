@@ -76,7 +76,7 @@ func (r *DockerRunner) Up(ctx context.Context, composePath, envFile string) erro
 // checking compose.yml, compose.yaml, docker-compose.yml, docker-compose.yaml.
 // Returns empty string if none exist.
 func (r *DockerRunner) FindComposeFile(path string) string {
-	for _, name := range []string{"compose.yml", "compose.yaml", "docker-compose.yml", "docker-compose.yaml"} {
+	for _, name := range []string{"compose.yaml", "compose.yml", "docker-compose.yaml", "docker-compose.yml"} {
 		full := filepath.Join(path, name)
 		if _, err := os.Stat(full); err == nil {
 			return full

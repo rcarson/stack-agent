@@ -26,6 +26,7 @@ type rawStack struct {
 	Branch       string `yaml:"branch"`
 	Token        string `yaml:"token"`
 	EnvFile      string `yaml:"env_file"`
+	ComposeFile  string `yaml:"compose_file"`
 	PollInterval int    `yaml:"poll_interval"`
 }
 
@@ -43,6 +44,7 @@ type StackConfig struct {
 	Branch       string
 	Token        string
 	EnvFile      string
+	ComposeFile  string
 	WorkDir      string
 	PollInterval int
 }
@@ -102,6 +104,7 @@ func mergeStack(raw rawStack, defaults rawDefaults) StackConfig {
 		Branch:       branch,
 		Token:        token,
 		EnvFile:      interpolate(raw.EnvFile),
+		ComposeFile:  interpolate(raw.ComposeFile),
 		WorkDir:      defaults.WorkDir,
 		PollInterval: pollInterval,
 	}

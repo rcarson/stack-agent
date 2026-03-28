@@ -87,9 +87,14 @@ func (s *Stack) poll(ctx context.Context) {
 		return
 	}
 
-	// Step 4: verify compose file exists.
+	// Step 4: resolve compose file path.
 	composeDir := filepath.Join(s.cfg.WorkDir, s.cfg.Name, s.cfg.Path)
-	composePath := s.compose.FindComposeFile(composeDir)
+	var composePath string
+	if s.cfg.ComposeFile != "" {
+		composePath = filepath.Join(composeDir, s.cfg.ComposeFile)
+	} else {
+		composePath = s.compose.FindComposeFile(composeDir)
+	}
 	if composePath == "" {
 		s.log.Error("agent: no compose file found", "dir", composeDir)
 		return
