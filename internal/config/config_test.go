@@ -390,6 +390,22 @@ stacks:
 	}
 }
 
+func TestLoad_BranchDefaultsToMain(t *testing.T) {
+	p := writeTemp(t, `
+stacks:
+  - name: mystack
+    repo: https://github.com/example/repo.git
+    path: stacks/mystack
+`)
+	cfg, err := Load(p)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.Stacks[0].Branch != "main" {
+		t.Errorf("expected default branch %q, got %q", "main", cfg.Stacks[0].Branch)
+	}
+}
+
 func TestLoad_ExplicitTokenOverridesImplicit(t *testing.T) {
 	t.Setenv("STEWARD_DEFAULT_TOKEN", "implicit-token")
 	t.Setenv("MY_TOKEN", "explicit-token")
